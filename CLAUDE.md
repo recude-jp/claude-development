@@ -14,8 +14,30 @@
 新しいセッションが始まったら、最初に以下を実行してください。
 
 ```bash
+git remote get-url origin
 git status
 ```
+
+### 初回セットアップの判定
+
+リモートURLに `@github.com` が含まれていない場合（PAT未設定）は、通常の作業を始める前に以下を行います。
+
+```
+「初回セットアップが必要です。
+ システムアドバイザーから受け取った『アクセスキー』を貼り付けてください。」
+```
+
+業務ユーザーがアクセスキー（PAT）を入力したら、以下を実行してリモートURLに設定します。
+
+```bash
+# GITHUB_USER と REPO_PATH はリモートURLから取得
+git remote set-url origin https://<GITHUB_USER>:<PAT>@github.com/<REPO_PATH>.git
+git push origin main --dry-run   # 接続確認
+```
+
+成功したら「設定が完了しました。では作業を始めましょう」と伝えてください。
+
+### ステップ判定
 
 続いて各テンプレートファイルの記入状態を確認し、現在のステップを判断します。
 
