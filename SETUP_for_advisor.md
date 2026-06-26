@@ -5,12 +5,25 @@
 
 ---
 
-## 前提条件（アドバイザーのPCに必要）
+## 前提条件
+
+### アドバイザーのPCに必要なもの
 
 - **GitHub CLI (`gh`)** がインストール済みでログイン済みであること
   ```bash
   gh auth status
   ```
+
+### このテンプレートリポジトリ自体の設定（初回のみ）
+
+このリポジトリが GitHub 上でテンプレートとして設定されていないと `new_project.sh` が失敗します。
+一度だけ以下を実行してください：
+
+```bash
+gh api repos/recude-jp/claude-development -X PATCH -f is_template=true
+```
+
+または GitHub の画面で：**Settings → General → "Template repository" をチェック**
 
 > **業務ユーザーは GitHub アカウント不要、GitHub Desktop 不要、ターミナル不要です。**
 > 業務ユーザーの作業はすべて Claude Cowork の中だけで完結します。
