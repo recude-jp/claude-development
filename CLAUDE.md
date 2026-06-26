@@ -14,20 +14,51 @@
 新しいセッションが始まったら、最初に以下を実行してください。
 
 ```bash
-git remote get-url origin
-git status
+git remote get-url origin 2>/dev/null || echo "NOT_A_GIT_REPO"
+git status 2>/dev/null || echo "NO_STATUS"
 ```
 
-### 初回セットアップの判定
+### パターン判定
 
-リモートURLに `@github.com` が含まれていない場合（PAT未設定）は、通常の作業を始める前に以下を行います。
+#### パターンA：まだクローンされていない（初回セットアップ）
+
+`NOT_A_GIT_REPO` が返った場合、または業務ユーザーが「セットアップをお願いします」と言った場合：
 
 ```
-「初回セットアップが必要です。
+「セットアップを始めます。
+ システムアドバイザーから受け取った以下の2つを教えてください。
+ ① リポジトリURL（例: https://github.com/xxx/yyy）
+ ② アクセスキー」
+```
+
+URL と PAT を受け取ったら、以下を実行します。
+
+```bash
+# GITHUB_USER はアドバイザーのGitHubユーザー名（URLから取得、またはアドバイザーに確認）
+# CLONE_DIR は ~/Documents/Claude/Projects/ など適切な場所
+git clone https://<GITHUB_USER>:<PAT>@github.com/<OWNER>/<REPO>.git <CLONE_DIR>/<REPO>
+```
+
+クローン完了後：
+
+```
+「セットアップが完了しました。
+ 次のステップ：
+ 1. Cowork の左上のフォルダアイコンから、このフォルダを選択してください：
+    <CLONE_DIR>/<REPO>
+ 2. フォルダを開いたら、「業務を自動化したいです」と話しかけてください。」
+```
+
+#### パターンB：クローン済みだが PAT 未設定
+
+`git remote get-url origin` の結果に `@github.com` が含まれていない場合：
+
+```
+「初回設定が必要です。
  システムアドバイザーから受け取った『アクセスキー』を貼り付けてください。」
 ```
 
-業務ユーザーがアクセスキー（PAT）を入力したら、以下を実行してリモートURLに設定します。
+PAT を受け取ったら、リモートURLに設定します。
 
 ```bash
 # GITHUB_USER と REPO_PATH はリモートURLから取得
@@ -36,6 +67,10 @@ git push origin main --dry-run   # 接続確認
 ```
 
 成功したら「設定が完了しました。では作業を始めましょう」と伝えてください。
+
+#### パターンC：通常セッション
+
+PAT 設定済みの場合、そのまま作業を続けます。
 
 ### ステップ判定
 
