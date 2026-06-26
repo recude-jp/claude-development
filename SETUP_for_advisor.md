@@ -1,21 +1,23 @@
 # システムアドバイザー向け：プロジェクト開始手順
 
-セットアップはスクリプトで自動化されています。
-`scripts/` フォルダの2本のスクリプトを順に実行するだけで完了します。
+業務ユーザーが **Claude Cowork だけで** 作業できる環境を整えるのがアドバイザーの役割です。
+以下の2つのスクリプトを順に実行すれば、業務ユーザーへの引き渡しまで完了します。
+
+> **業務ユーザーはターミナルもGitHubも触りません。**
+> セットアップが済んだら Cowork を開いて話しかけるだけです。
 
 ---
 
-## 前提条件
+## 前提条件（アドバイザーのPCに必要）
 
-- システムアドバイザーのPCに **GitHub CLI (`gh`)** がインストール済みでログイン済みであること
+- **GitHub CLI (`gh`)** がインストール済みでログイン済みであること
   ```bash
   gh auth status  # ログイン確認
   ```
-- このテンプレートリポジトリへのアクセス権があること
 
 ---
 
-## Step 1：新規リポジトリ作成（システムアドバイザーのPCで実行）
+## Step 1：新規リポジトリ作成（アドバイザーのPCで実行）
 
 ```bash
 bash scripts/new_project.sh
@@ -29,62 +31,74 @@ bash scripts/new_project.sh
 | 新しいリポジトリ名 | `yamada-sales-automation` |
 | オーナー | `myorg` |
 | 業務ユーザーの名前 | `山田 太郎` |
-| システムアドバイザーの名前・連絡先 | `鈴木（suzuki@example.com）` |
-| クローン先ディレクトリ | `./` (Enterでデフォルト) |
+| アドバイザーの名前・連絡先 | `鈴木（suzuki@example.com）` |
+| クローン先ディレクトリ | Enter でデフォルト（./） |
 
-スクリプトが以下を自動で行います：
+スクリプトが自動で行うこと：
 - テンプレートから private リポジトリを作成
-- クローン
-- テンプレート不要ファイル（`README.md`、`CHANGELOG.md`、`scripts/`）を削除
+- クローン・不要ファイル削除（`README.md`、`CHANGELOG.md`、`scripts/`）
 - `README_for_business_user.md` に担当者名を記入
 - コミット・プッシュ
 
 ---
 
-## Step 2：業務ユーザーPCのセットアップ（業務ユーザーのPCで実行）
+## Step 2：業務ユーザーPCのセットアップ（**業務ユーザーのPCで**アドバイザーが実行）
 
-業務ユーザーのPCに移動し、Step 1 完了時に表示されたリポジトリURLを使って実行します。
+業務ユーザーのPCに移動またはリモート接続し、アドバイザーが以下を実行します。
+**業務ユーザー自身が操作する必要はありません。**
 
 ```bash
 bash setup_user_pc.sh https://github.com/<オーナー>/<リポジトリ名>.git
 ```
 
-> Step 1 のスクリプト完了時に正確なコマンドが表示されます。
+> Step 1 完了時に正確なコマンドが画面に表示されます。
 
-スクリプトが以下を自動で行います：
+スクリプトが自動で行うこと：
 - リポジトリをクローン
-- GitHub PAT を使った HTTPS 認証を設定（PAT 入力を求められます）
-- 接続確認
-- 業務ユーザーへの案内メッセージを表示
+- GitHub PAT（要事前発行）を使った HTTPS 認証を設定
+- 接続確認（push テスト）
 
-> **PAT の発行**: Step 2 実行前に GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic) で `repo` スコープのトークンを発行してください。業務ユーザー自身は GitHub アカウント不要です。
+完了後、クローン先のフォルダパスが表示されます。
+このパスを業務ユーザーに伝えてください。
+
+### PAT の発行（Step 2 実行前に済ませる）
+
+GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
+
+- **Scopes**: `repo` のみ
+- **Expiration**: プロジェクト期間に合わせて設定（90日〜1年推奨）
+
+> 業務ユーザーは GitHub アカウントを持つ必要はありません。
+> PAT はアドバイザーの GitHub アカウントで発行します。
 
 ---
 
-## 完了後
+## Step 3：業務ユーザーへの引き渡し
 
-業務ユーザーに以下だけ伝えてください：
+以下を伝えるだけで完了です：
 
-1. **Claude Cowork を開いて、クローンされたフォルダを選択する**
-2. **「業務を自動化したいです」と話しかけるだけでOK**
+```
+「Claude Cowork を開いて、このフォルダを選択してください」
+  → <Step 2 完了時に表示されたフォルダパス>
+
+「あとは「業務を自動化したいです」と話しかけるだけです」
+```
 
 ---
 
 ## PAT の期限切れ時
 
 業務ユーザーから「共有できなくなった」と連絡が来た場合、
-新しい PAT を発行して業務ユーザーのPCで以下を実行します：
+新しい PAT を発行してアドバイザーが業務ユーザーのPCで以下を実行します：
 
 ```bash
 cd <リポジトリフォルダ>
-git remote set-url origin https://<GitHubユーザー名>:<新しいPAT>@github.com/<オーナー>/<リポジトリ名>.git
+git remote set-url origin https://<GitHubユーザー名>:<新PAT>@github.com/<オーナー>/<リポジトリ名>.git
 ```
 
 ---
 
 ## スクリプトの詳細
 
-詳細な処理内容は各スクリプトのコメントを参照してください：
-
-- `scripts/new_project.sh` — リポジトリ作成・初期化
-- `scripts/setup_user_pc.sh` — 業務ユーザーPC認証設定
+- `scripts/new_project.sh` — リポジトリ作成・初期化（アドバイザーのPCで実行）
+- `scripts/setup_user_pc.sh` — 業務ユーザーPC認証設定（業務ユーザーのPCでアドバイザーが実行）
