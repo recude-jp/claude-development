@@ -54,10 +54,11 @@ cd <リポジトリ名>
 
 | ファイル | 理由 |
 |---|---|
+| `README.md` | テンプレートリポジトリの説明。プロジェクトには不要 |
 | `CHANGELOG.md` | テンプレート自体の改訂履歴。プロジェクトには不要 |
 
 ```bash
-git rm CHANGELOG.md
+git rm README.md CHANGELOG.md
 ```
 
 以下のファイルは**そのまま残す**ものです：
