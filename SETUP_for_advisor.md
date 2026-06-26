@@ -1,77 +1,176 @@
-# システムアドバイザー向け：業務ユーザーPCの初期セットアップ手順
+# システムアドバイザー向け：プロジェクト開始から業務ユーザー引き渡しまでの手順
 
-業務ユーザーが Claude Cowork から GitHub へ push できるよう、
-**最初の一回だけ**このセットアップを業務ユーザーのPCで行ってください。
-
----
-
-## 前提
-
-- 業務ユーザーのPCにはすでにリポジトリがクローンされている
-- システムアドバイザーが GitHub の PAT（Personal Access Token）を発行する
+このファイルは**システムアドバイザーだけが読む**セットアップガイドです。
+業務ユーザーへの引き渡し前に、以下の手順をすべて完了してください。
 
 ---
 
-## Step 1：GitHub で PAT を発行する（システムアドバイザーが実施）
+## 全体の流れ
 
-1. GitHub にログインし、右上のアイコン → **Settings** を開く
-2. 左メニュー最下部の **Developer settings** → **Personal access tokens** → **Tokens (classic)** を開く
+```
+Step 1: GitHubでテンプレートから新規リポジトリを作成
+  ↓
+Step 2: ローカルにクローン
+  ↓
+Step 3: テンプレート不要ファイルを削除・整理
+  ↓
+Step 4: README_for_business_user.md にプロジェクト情報を記入
+  ↓
+Step 5: 整理した状態をコミット・プッシュ
+  ↓
+Step 6: 業務ユーザーのPCにクローン
+  ↓
+Step 7: 業務ユーザーのPCにGitHub認証（HTTPS+PAT）を設定
+  ↓
+Step 8: 動作確認して業務ユーザーに引き渡す
+```
+
+---
+
+## Step 1：テンプレートから新規リポジトリを作成
+
+1. GitHub でこのテンプレートリポジトリを開く
+2. **Use this template** → **Create a new repository** をクリック
+3. 設定内容：
+   - **Repository name**: プロジェクト名（例: `yamada-sales-automation`）
+   - **Owner**: 適切なオーナー（個人またはOrganization）
+   - **Visibility**: `Private`（社内業務データを扱うため原則プライベート）
+4. **Create repository** をクリック
+
+---
+
+## Step 2：ローカルにクローン（システムアドバイザーのPC）
+
+```bash
+git clone https://github.com/<オーナー>/<リポジトリ名>.git
+cd <リポジトリ名>
+```
+
+---
+
+## Step 3：テンプレート不要ファイルを削除・整理
+
+以下のファイルはテンプレート管理用のため、**プロジェクトリポジトリからは削除**してください。
+
+| ファイル | 理由 |
+|---|---|
+| `CHANGELOG.md` | テンプレート自体の改訂履歴。プロジェクトには不要 |
+
+```bash
+git rm CHANGELOG.md
+```
+
+以下のファイルは**そのまま残す**ものです：
+
+| ファイル | 用途 |
+|---|---|
+| `CLAUDE.md` | Claude への操作指示。プロセス全体を通して必要 |
+| `SETUP_for_advisor.md` | 本ファイル。引き渡し後は削除しても可 |
+| `README_for_business_user.md` | 業務ユーザーが最初に読むガイド |
+| `01_requirements_brainstorm.md` | ステップ①のテンプレート |
+| `02_basic_design.md` | ステップ②のテンプレート |
+
+> `03_design_review_checklist.md` と `04_coding_instruction.md` はプロセス中に作成するため、現時点では不要です。
+
+---
+
+## Step 4：README_for_business_user.md にプロジェクト情報を記入
+
+ファイル冒頭のメタ情報を埋めてください：
+
+```
+担当: （業務ユーザーの名前）
+システムアドバイザー: （あなたの名前・連絡先）
+```
+
+業務ユーザーが困ったときに誰に連絡するか明記しておくと安心です。
+
+---
+
+## Step 5：整理した状態をコミット・プッシュ
+
+```bash
+git add -A
+git commit -m "docs: プロジェクト初期設定（テンプレート不要ファイル削除）"
+git push origin main
+```
+
+---
+
+## Step 6：業務ユーザーのPCにクローン
+
+業務ユーザーのPCで以下を実行します（システムアドバイザーが代わりに操作してOK）。
+
+```bash
+git clone https://github.com/<オーナー>/<リポジトリ名>.git
+cd <リポジトリ名>
+```
+
+クローン先のフォルダパスを業務ユーザーに伝えておいてください。
+Claude Cowork でそのフォルダを開く必要があります。
+
+---
+
+## Step 7：業務ユーザーのPCにGitHub認証（HTTPS+PAT）を設定
+
+### 7-1：PAT を発行する（システムアドバイザーのGitHubアカウントで実施）
+
+1. GitHub → 右上アイコン → **Settings**
+2. 左メニュー最下部 **Developer settings** → **Personal access tokens** → **Tokens (classic)**
 3. **Generate new token (classic)** をクリック
-4. 設定内容：
-   - **Note**（名前）: `業務ユーザー名-cowork` など任意
-   - **Expiration**: 必要な期間を設定（90日〜1年推奨）
-   - **Scopes**: `repo` にチェック（これだけでOK）
-5. **Generate token** をクリックし、表示されたトークン文字列をコピーして安全な場所に保管する
-   （このページを閉じると二度と表示されません）
+4. 設定：
+   - **Note**: `<業務ユーザー名>-cowork` など
+   - **Expiration**: 90日〜1年（プロジェクト期間に合わせて設定）
+   - **Scopes**: `repo` のみチェック
+5. **Generate token** → 表示されたトークンをコピーして安全に保管
 
----
+> 業務ユーザー自身は GitHub アカウントを持つ必要はありません。
 
-## Step 2：業務ユーザーのPCでリモートURLを設定する（システムアドバイザーが実施）
-
-業務ユーザーのPCのターミナルで以下を実行します。
+### 7-2：業務ユーザーのPCでリモートURLを変更する
 
 ```bash
 cd <リポジトリのフォルダパス>
 
-# 現在のリモートURLを確認
-git remote -v
-
-# HTTPSにPATを埋め込んだURLに変更（以下の3箇所を置き換える）
-git remote set-url origin https://<GitHubユーザー名>:<PAT>@github.com/<リポジトリのオーナー>/<リポジトリ名>.git
+git remote set-url origin https://<GitHubユーザー名>:<PAT>@github.com/<オーナー>/<リポジトリ名>.git
 ```
 
-### 例
+**例：**
 
 ```bash
-git remote set-url origin https://recude-jp:ghp_xxxxxxxxxxxxxxxxxxxx@github.com/recude-jp/claude-development.git
+git remote set-url origin https://advisor-account:ghp_xxxxxxxxxxxxxxxxxxxx@github.com/myorg/yamada-sales-automation.git
 ```
 
-設定が正しいか確認：
+設定確認：
 
 ```bash
 git remote -v
-# → https://recude-jp:ghp_xxx...@github.com/recude-jp/claude-development.git と表示されればOK
+# → https://advisor-account:ghp_xxx...@github.com/myorg/yamada-sales-automation.git と表示されればOK
 ```
 
 ---
 
-## Step 3：動作確認
+## Step 8：動作確認して業務ユーザーに引き渡す
 
 ```bash
+# 業務ユーザーのPCで push が通るか確認
 git push origin main
 ```
 
-エラーなく完了すれば設定完了です。
-以後、業務ユーザーは Claude Cowork から「共有してください」と言うだけで push できます。
+エラーなく完了したら準備完了です。
+業務ユーザーに以下を伝えてください：
+
+1. **Claude Cowork を開いて、クローンしたフォルダを選択する**
+2. **「業務を自動化したいです」と話しかけるだけでOK**
+3. **困ったことがあればすぐ連絡する**（遠慮不要、それがこのプロセスの正式な進め方）
 
 ---
 
-## 注意事項
+## PAT の期限切れ・再設定が必要なとき
 
-- PAT は `.git/config` に保存されますが、このファイルは `.gitignore` 対象外であるため  
-  **絶対に `git add .git/config` しないでください**（通常の `git add` では追跡されません）
-- PAT の有効期限が切れた場合は、Step 1〜2 を再実施してください
-- PAT を紛失・漏洩した場合は GitHub の設定画面から即座に無効化してください
+業務ユーザーから「push できなくなった」と連絡が来た場合：
+
+1. GitHub で新しい PAT を発行（Step 7-1）
+2. 業務ユーザーのPCで `git remote set-url` を再実行（Step 7-2）
 
 ---
 
@@ -81,5 +180,5 @@ git push origin main
 |---|---|
 | `remote: Repository not found.` | リポジトリ名・オーナー名のスペルミスを確認 |
 | `could not read Username` | URL に `ユーザー名:PAT@` が含まれているか確認 |
-| `403 Forbidden` | PAT の `repo` スコープが有効か、有効期限切れでないか確認 |
-| `push` が通らない | `git remote -v` でURLを再確認し、PATを再発行して設定し直す |
+| `403 Forbidden` | PAT の `repo` スコープ確認、有効期限切れでないか確認 |
+| `push` できない | `git remote -v` でURLを再確認し、PATを再発行して設定し直す |
