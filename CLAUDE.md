@@ -292,6 +292,7 @@ git diff --stat
 
 ```bash
 cd $REPO_DIR
+find .git -name "*.lock" -delete 2>/dev/null
 git add -A
 git commit -m "<コミットメッセージ>"
 git push origin main
