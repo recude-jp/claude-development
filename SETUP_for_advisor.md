@@ -40,7 +40,7 @@ bash scripts/new_project.sh
 
 | 入力項目 | 例 |
 |---|---|
-| テンプレートリポジトリ | `myorg/automation-template` |
+| テンプレートリポジトリ | Enter でデフォルト（`recude-jp/claude-development`）|
 | 新しいリポジトリ名 | `yamada-sales-automation` |
 | オーナー | `myorg` |
 | 業務ユーザーの名前 | `山田 太郎` |

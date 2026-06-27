@@ -18,7 +18,8 @@ echo -e "${BLUE}=== 業務自動化サポート：新規プロジェクトセッ
 echo ""
 
 # --- 入力収集 ---
-read -p "テンプレートリポジトリ (例: myorg/automation-template) : " TEMPLATE_REPO
+read -p "テンプレートリポジトリ [recude-jp/claude-development]  : " TEMPLATE_REPO
+TEMPLATE_REPO=${TEMPLATE_REPO:-recude-jp/claude-development}
 read -p "新しいリポジトリ名 (例: yamada-sales-automation)       : " NEW_REPO_NAME
 read -p "オーナー (GitHubユーザー名 or Organization)            : " OWNER
 read -p "業務ユーザーの名前                                      : " BIZ_USER_NAME
