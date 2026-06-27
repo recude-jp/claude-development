@@ -14,9 +14,19 @@
 新しいセッションが始まったら、最初に以下を実行してください。
 
 ```bash
-git remote get-url origin 2>/dev/null || echo "NOT_A_GIT_REPO"
-git status 2>/dev/null || echo "NO_STATUS"
+# プロジェクトフォルダ（$(pwd)/mnt/ 以下）に git リポジトリがあるか確認
+REPO_DIR=$(find $(pwd)/mnt -maxdepth 2 -name ".git" -type d 2>/dev/null | head -1 | sed 's|/.git$||')
+if [ -n "$REPO_DIR" ]; then
+  cd "$REPO_DIR"
+  git remote get-url origin 2>/dev/null || echo "NOT_A_GIT_REPO"
+  git status
+else
+  echo "NOT_A_GIT_REPO"
+fi
 ```
+
+> **重要**: 以降の git 操作（add/commit/push）はすべて `$REPO_DIR`（上で特定したフォルダ）を
+> カレントディレクトリにして実行してください。
 
 ### パターン判定
 
@@ -24,29 +34,21 @@ git status 2>/dev/null || echo "NO_STATUS"
 
 `NOT_A_GIT_REPO` が返った場合、または業務ユーザーが「セットアップをお願いします」と言った場合：
 
+チャットメッセージに `git clone` コマンドが含まれている場合は、そのままコマンドを実行してください。
+クローン先は `$(pwd)/mnt/<リポジトリ名>` の形式です（プロジェクトフォルダに直接展開されます）。
+
+含まれていない場合は以下を聞いてください：
 ```
 「セットアップを始めます。
- システムアドバイザーから受け取った以下の2つを教えてください。
- ① リポジトリURL（例: https://github.com/xxx/yyy）
- ② アクセスキー」
+ システムアドバイザーから受け取った git clone コマンドを貼り付けてください。」
 ```
 
-URL と PAT を受け取ったら、以下を実行します。
+クローンが完了したら、`$(pwd)/mnt/<リポジトリ名>/CLAUDE.md` を読み込み、その指示に従って作業を進めてください。
 
-```bash
-# GITHUB_USER はアドバイザーのGitHubユーザー名（URLから取得、またはアドバイザーに確認）
-# CLONE_DIR は ~/Documents/Claude/Projects/ など適切な場所
-git clone https://<GITHUB_USER>:<PAT>@github.com/<OWNER>/<REPO>.git <CLONE_DIR>/<REPO>
-```
-
-クローン完了後：
-
+完了後：
 ```
 「セットアップが完了しました。
- 次のステップ：
- 1. Cowork の左上のフォルダアイコンから、このフォルダを選択してください：
-    <CLONE_DIR>/<REPO>
- 2. フォルダを開いたら、「業務を自動化したいです」と話しかけてください。」
+ 「業務を自動化したいです」と話しかけてください。」
 ```
 
 #### パターンB：クローン済みだが PAT 未設定
@@ -278,10 +280,13 @@ Claudeが構成案を提示する。**専門用語が出たら必ず業務ユー
 
 > **前提**: リモートURLがHTTPS+PAT形式で設定済みであること。
 > 未設定の場合は `SETUP_for_advisor.md` の手順をシステムアドバイザーに依頼してください。
+>
+> **必須**: セッション開始時に特定した `$REPO_DIR` に `cd` してから実行すること。
 
 ### 1. 変更確認
 
 ```bash
+cd $REPO_DIR
 git status
 git diff --stat
 ```
@@ -289,6 +294,7 @@ git diff --stat
 ### 2. ステージング・コミット・プッシュ
 
 ```bash
+cd $REPO_DIR
 git add -A
 git commit -m "<コミットメッセージ>"
 git push origin main
