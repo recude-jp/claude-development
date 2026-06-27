@@ -43,8 +43,7 @@ bash scripts/new_project.sh
 | テンプレートリポジトリ | `myorg/automation-template` |
 | 新しいリポジトリ名 | `yamada-sales-automation` |
 | オーナー | `myorg` |
-| 業務ユーザーのGitHubユーザー名 | `yamada-taro` |
-| 業務ユーザーの表示名 | `山田 太郎` |
+| 業務ユーザーの名前 | `山田 太郎` |
 | アドバイザーの名前・連絡先 | `鈴木（suzuki@example.com）` |
 | PAT（push用） | `ghp_xxxxxxxxxxxx`（事前に発行しておく） |
 

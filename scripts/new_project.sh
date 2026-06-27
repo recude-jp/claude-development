@@ -21,8 +21,7 @@ echo ""
 read -p "テンプレートリポジトリ (例: myorg/automation-template) : " TEMPLATE_REPO
 read -p "新しいリポジトリ名 (例: yamada-sales-automation)       : " NEW_REPO_NAME
 read -p "オーナー (GitHubユーザー名 or Organization)            : " OWNER
-read -p "業務ユーザーのGitHubユーザー名                         : " BIZ_USER_GITHUB
-read -p "業務ユーザーの表示名                                    : " BIZ_USER_NAME
+read -p "業務ユーザーの名前                                      : " BIZ_USER_NAME
 read -p "システムアドバイザーの名前・連絡先                      : " ADVISOR_INFO
 read -p "クローン先ディレクトリ (デフォルト: ./)               : " CLONE_DIR
 CLONE_DIR=${CLONE_DIR:-.}
@@ -34,7 +33,7 @@ PROJECT_DIR="$CLONE_DIR/$NEW_REPO_NAME"
 echo ""
 echo -e "${YELLOW}以下の内容でセットアップを開始します:${NC}"
 echo "  リポジトリ    : https://github.com/$NEW_REPO_FULL (private)"
-echo "  業務ユーザー  : $BIZ_USER_NAME (@$BIZ_USER_GITHUB)"
+echo "  業務ユーザー  : $BIZ_USER_NAME"
 echo "  アドバイザー  : $ADVISOR_INFO"
 echo ""
 read -p "よろしいですか？ [y/N]: " CONFIRM
@@ -83,12 +82,6 @@ echo -e "${BLUE}▶ コミット・プッシュ中...${NC}"
 git add -A
 git commit -m "docs: プロジェクト初期設定"
 git push origin main
-
-# --- 業務ユーザーをコラボレーターとして招待 ---
-echo -e "${BLUE}▶ 業務ユーザーをコラボレーターに招待中...${NC}"
-gh api "repos/$NEW_REPO_FULL/collaborators/$BIZ_USER_GITHUB" \
-  -X PUT -f permission=push \
-  --silent && echo "  招待しました: @$BIZ_USER_GITHUB"
 
 # --- 完了 ---
 echo ""
